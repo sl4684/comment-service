@@ -10,7 +10,7 @@ from werkzeug.utils import redirect
 from Comment_Application.CommentService import CommentService as CommentService
 from RDB_Application.RDBService import RDBService as RDBService
 from middleware.notification import notify
-from security import check_security
+# from security import check_security
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -19,10 +19,10 @@ logger.setLevel(logging.INFO)
 app = Flask(__name__)
 CORS(app)
 
-@app.before_request
-def before_request_func():
-    if not check_security(request):
-        return redirect(url_for("google.login"))
+# @app.before_request
+# def before_request_func():
+#     if not check_security(request):
+#         return redirect(url_for("google.login"))
 
 @app.after_request
 def after_request_func(response):
