@@ -18,7 +18,7 @@ class CommentService():
         
         if user_comment:
             comment_sql = comment_sql + " and username = '" + user_comment + "'"
-            print("SQL Statement = " + cur_comment.mogrify(comment_sql, None))
+            return "No comment for the user"
 
         if limit:
             comment_sql = comment_sql + " limit " + str(limit)
