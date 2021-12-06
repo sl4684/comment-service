@@ -136,7 +136,7 @@ def check_valid(data):
     key_list = ['news_id', 'username', 'comment_info', 'timestamp']
     for keys in key_list:
         if keys not in data.keys():
-            return False, "You need to have" + keys
+            return False, "Inputs format needs to have" + keys
         elif keys == 'news_id':
             if type(data[keys]) != int:
                 return False, "news_id should be an integer" 
