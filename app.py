@@ -72,11 +72,11 @@ def get_comment(news_id):
 @app.route('/discover/post',methods = ['POST'])
 def create_comment():
     comment_data = request.get_json()
-    # if 'timestamp' in comment_data.keys():
-    #     return Response(json.dumps("Bad Data"), status=400, content_type="application/json")
-    # times = datetime.now()
-    # timestamp = times.strftime("%Y-%m-%d %H:%M:%S")
-    # comment_data['timestamp'] = timestamp
+    if 'timestamp' in comment_data.keys():
+        return Response(json.dumps("Bad Data: you should not include timestamp"), status=400, content_type="application/json")
+    times = datetime.now()
+    timestamp = times.strftime("%Y-%m-%d %H:%M:%S")
+    comment_data['timestamp'] = timestamp
     (bool, error_message) = check_valid(comment_data)
     if not bool:
         return Response(json.dumps("Bad Data: " + error_message), status=400, content_type="application/json") 
