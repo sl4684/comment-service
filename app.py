@@ -72,15 +72,14 @@ def get_comment(news_id):
 @app.route('/discover/post',methods = ['POST'])
 def create_comment():
     comment_data = request.get_json()
-    if 'timestamp' in comment_data.keys():
-        return Response(json.dumps("Bad Data"), status=400, content_type="application/json")
-
-    times = datetime.now()
-    timestamp = times.strftime("%Y-%m-%d %H:%M:%S")
-    comment_data['timestamp'] = timestamp
-
-    if not check_valid(comment_data):
-        return Response(json.dumps("Bad Data"), status=400, content_type="application/json") 
+    # if 'timestamp' in comment_data.keys():
+    #     return Response(json.dumps("Bad Data"), status=400, content_type="application/json")
+    # times = datetime.now()
+    # timestamp = times.strftime("%Y-%m-%d %H:%M:%S")
+    # comment_data['timestamp'] = timestamp
+    (bool, error_message) = check_valid(comment_data)
+    if not bool:
+        return Response(json.dumps("Bad Data: " + error_message), status=400, content_type="application/json") 
     
     res = RDBService.create("Comments", "comment", comment_data)
     if res == "connection failed":
@@ -124,8 +123,9 @@ def create_comment():
 @app.route('/discover/delete',methods = ['DELETE'])
 def delete_comment():
     comment_data = request.get_json()
-    if not check_valid(comment_data):
-        return Response(json.dumps("Bad Data"), status=400, content_type="application/json") 
+    (bool, error_message) = check_valid(comment_data)
+    if not bool:
+        return Response(json.dumps("Bad Data: " + error_message), status=400, content_type="application/json") 
     res = RDBService.delete("Comments", "comment", comment_data)
     if res == "connection failed":
         return Response(json.dumps("Database connection failed"), status=500, content_type="application/json")
@@ -136,18 +136,17 @@ def check_valid(data):
     key_list = ['news_id', 'username', 'comment_info', 'timestamp']
     for keys in key_list:
         if keys not in data.keys():
-            return False
+            return False, "You need to have" + keys
         elif keys == 'news_id':
             if type(data[keys]) != int:
-                return False 
+                return False, "news_id should be an integer" 
         elif keys == 'timestamp':
             format = "%Y-%m-%d %H:%M:%S"
             try:
-                if not bool(datetime.strptime(data['timestamp'], format)):
-                    return False
+                bool(datetime.strptime(data['timestamp'], format))
             except ValueError:
-                return False
-    return True
+                return False, "datetime format is not correct"
+    return True, "everything is ok"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
