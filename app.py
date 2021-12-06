@@ -52,17 +52,19 @@ def get_comment(news_id):
     elif comment_res == "connection failed":
         return Response(json.dumps("Database connection failed"), status=500, content_type="application/json")
 
-    news_res = CommentService.get_news_by_id(news_id)
-    if not news_res:
-        return Response(json.dumps("The request fields are not available"), status=404, content_type="application/json")
-    elif news_res == "connection failed":
-        return Response(json.dumps("Database connection failed"), status=500, content_type="application/json")
-        
-    return_res = {'news': { 'news_id': news_id, 'content_full': news_res[0]['full_content'], 'comments':[] }, 
+    # news_res = CommentService.get_news_by_id(news_id)
+    # if not news_res:
+    #     return Response(json.dumps("The request fields are not available"), status=404, content_type="application/json")
+    # elif news_res == "connection failed":
+    #     return Response(json.dumps("Database connection failed"), status=500, content_type="application/json")
+    # return_res = {'news': { 'news_id': news_id, 'content_full': news_res[0]['full_content'], 'comments':[] }, 
+    #               'links':[ {'rel': 'self', 'href': '/discover/' + news_id } ] }
+    return_res = {'news': news_id, 
+                  'comments':[], 
                   'links':[ {'rel': 'self', 'href': '/discover/' + news_id } ] }
     for i in range(len(comment_res)):
         dict = {'username': comment_res[i]['username'], 'comment_info': comment_res[i]['comment_info'], 'timestamp': str(comment_res[i]['timestamp'])}
-        return_res['news']['comments'].append(dict)
+        return_res['comments'].append(dict)
 
     rsp = Response(json.dumps(return_res), status=200, content_type="application/json")
     return rsp
@@ -70,6 +72,9 @@ def get_comment(news_id):
 @app.route('/discover/post',methods = ['POST'])
 def create_comment():
     comment_data = request.get_json()
+    if 'timestamp' in comment_data.keys():
+        return Response(json.dumps("Bad Data"), status=400, content_type="application/json")
+
     times = datetime.now()
     timestamp = times.strftime("%Y-%m-%d %H:%M:%S")
     comment_data['timestamp'] = timestamp
@@ -97,20 +102,21 @@ def create_comment():
     elif comment_res == "connection failed":
         return Response(json.dumps("Database connection failed"), status=500, content_type="application/json")
 
-    news_res = CommentService.get_news_by_id(str(comment_data['news_id']))
-    if not news_res:
-        return Response(json.dumps("The request fields are not available"), status=404, content_type="application/json")
-    elif news_res == "connection failed":
-        return Response(json.dumps("Database connection failed"), status=500, content_type="application/json")
+    # news_res = CommentService.get_news_by_id(str(comment_data['news_id']))
+    # if not news_res:
+    #     return Response(json.dumps("The request fields are not available"), status=404, content_type="application/json")
+    # elif news_res == "connection failed":
+    #     return Response(json.dumps("Database connection failed"), status=500, content_type="application/json")
 
     return_res = {'username': comment_data['username'],
-                  'news': {'news_id': comment_data['news_id'], 'content_full': news_res[0]['full_content'], 'comments': []}, 
+                  'news': comment_data['news_id'], 
+                  'comments': [], 
                   'links':[ {'rel': 'self', 'href': '/discover/post'}, 
                             {'rel': 'user', 'href': '/api/v1/users/' + comment_data['username']},
                             {'rel': 'news', 'href': '/discover/' + str(comment_data['news_id'])} ]}
     for i in range(len(comment_res)):
         dict = {'username': comment_res[i]['username'], 'comment_info': comment_res[i]['comment_info'], 'timestamp': str(comment_res[i]['timestamp'])}
-        return_res['news']['comments'].append(dict)
+        return_res['comments'].append(dict)
     print(return_res)
     rsp = Response(json.dumps(return_res), status=201, content_type="application/json")
     return rsp
@@ -137,8 +143,8 @@ def check_valid(data):
         elif keys == 'timestamp':
             format = "%Y-%m-%d %H:%M:%S"
             try:
-                print("here")
-                return bool(datetime.strptime(data['timestamp'], format))
+                if not bool(datetime.strptime(data['timestamp'], format)):
+                    return False
             except ValueError:
                 return False
     return True

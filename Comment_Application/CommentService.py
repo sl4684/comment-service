@@ -35,21 +35,21 @@ class CommentService():
 
         return res_comment
 
-    @classmethod
-    def get_news_by_id(cls, news_id):
-        conn_news = RDBService.get_db_connection("news")
+    # @classmethod
+    # def get_news_by_id(cls, news_id):
+    #     conn_news = RDBService.get_db_connection("news")
 
-        if not conn_news:
-            return "connection failed"
+    #     if not conn_news:
+    #         return "connection failed"
 
-        cur_news = conn_news.cursor()
+    #     cur_news = conn_news.cursor()
 
-        news_sql = "select full_content from `db-news-schema`.`news_table` where news_id = " + news_id
-        print("SQL Statement = " + cur_news.mogrify(news_sql, None))
+    #     news_sql = "select full_content from `db-news-schema`.`news_table` where news_id = " + news_id
+    #     print("SQL Statement = " + cur_news.mogrify(news_sql, None))
 
-        res_news = cur_news.execute(news_sql)
-        res_news = cur_news.fetchall()
+    #     res_news = cur_news.execute(news_sql)
+    #     res_news = cur_news.fetchall()
 
-        conn_news.close()
+    #     conn_news.close()
 
-        return res_news
+    #     return res_news
