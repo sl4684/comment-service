@@ -72,18 +72,7 @@ def get_comment(news_id):
                 'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'}
 
     rsp = Response(json.dumps(return_res), status=200, content_type="application/json", headers=header)
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-        },
-        # 'body': json.dumps(response.json()),
-        'body': json.dumps(return_res),
-        'isBase64Encoded': False
-    }
+    return rsp
 
 @app.route('/discover/post',methods = ['POST'])
 def create_comment():
